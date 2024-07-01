@@ -1,0 +1,47 @@
+{
+  "name": "@siyu971017/turtle.js",
+  "version": "1.0.0",
+  "description": "JavaScript version of turtle graphics",
+  "main": "dist/turtle.umd.js",
+  "module": "dist/turtle.esm.js",
+  "scripts": {
+    "build": "npm i && rollup --c",
+    "dev": "rollup -c -w",
+    "test": "node tests/test.js",
+    "pretest": "npm run build"
+  },
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Siyu1017/turtle.js.git"
+  },
+  "author": "Siyu1017",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Siyu1017/turtle.js/issues"
+  },
+  "homepage": "https://github.com/Siyu1017/turtle.js#readme",
+  "dependencies": {
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "rollup": "^2.79.1",
+    "rollup-plugin-babel": "^4.4.0",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-peer-deps-external": "^2.2.4"
+  },
+  "devDependencies": {
+    "@rollup/plugin-buble": "^1.0.3",
+    "@rollup/plugin-commonjs": "^26.0.1",
+    "@rollup/plugin-terser": "^0.4.4",
+    "rollup-plugin-banner": "^0.2.1",
+    "rollup-plugin-delete": "^2.0.0",
+    "rollup-plugin-node-builtins": "^2.1.2",
+    "rollup-plugin-node-globals": "^1.4.0",
+    "rollup-plugin-node-resolve": "^5.2.0"
+  },
+  "directories": {
+    "test": "tests"
+  }
+}
