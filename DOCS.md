@@ -2,19 +2,24 @@
 
 ## Table of contents
 
-### Turtle methods
+### Methods specific to Turtle.js
+- [setlinecap()](#turtlesetlinecaptype)
+- [setlinejoin()](#turtlesetlinejointype)
+- [seteasing()](#turtleseteasingeasing)
+- [setduration()](#turtlesetdurationduration)
 
+### Turtle methods
 - Turtle motion
     - Move and draw
-        - [forward()](#turtleforwarddistance) | fd()
-        - [backward()](#turtlebackwarddistance) | bk() | back()
-        - [right()](#turtlerightangle) | rt()
-        - [left()](#turtleleftangle) | lt()
-        - [goto()](#turtlegotox-y) | setpos() | setposition()
+        - [forward()](#turtleforwarddistance) | [fd()](#turtleforwarddistance)
+        - [backward()](#turtlebackwarddistance) | [bk()](#turtlebackwarddistance) | [back()](#turtlebackwarddistance)
+        - [right()](#turtlerightangle) | [rt()](#turtlerightangle)
+        - [left()](#turtleleftangle) | [lt()](#turtleleftangle)
+        - [goto()](#turtlegotox-y) | [setpos()](#turtlegotox-y) | [setposition()](#turtlegotox-y)
         - [teleport()](#turtleteleportx-y)
         - [setx()](#turtlesetxx)
         - [sety()](#turtlesetyy)
-        - [setheading()](#turtlesetheadingangle) | seth()
+        - [setheading()](#turtlesetheadingangle) | [seth()](#turtlesetheadingangle)
         - [home()](#turtlehome)
         - [circle()](#turtlecircleradius-startangle0-endangle360)
         - [dot()](#turtledotsize-color)
@@ -24,7 +29,7 @@
         - undo()
         - speed()
     - Tell Turtle’s state
-        - [position()](#turtleposition) | pos()
+        - [position()](#turtleposition) | [pos()](#turtleposition)
         - towards()
         - [xcor()](#turtlexcor)
         - [ycor()](#turtleycor)
@@ -35,9 +40,9 @@
         - radians()
 - Pen control
     - Drawing state
-        - [pendown()](#turtlependown) | pd() | down()
-        - [penup()](#turtlepenup) | pu() | up()
-        - [pensize()](#turtlepensizewidthnone) | width()
+        - [pendown()](#turtlependown) | [pd()](#turtlependown) | [down()](#turtlependown)
+        - [penup()](#turtlepenup) | [pu()](#turtlepenup) | [up()](#turtlepenup)
+        - [pensize()](#turtlepensizewidthnone) | [width()](#turtlepensizewidthnone)
         - pen()
         - [isdown()](#turtleisdown)
     - Color control
@@ -54,11 +59,11 @@
         - [write()](#turtlewritearg-movefalse-alignleft-font)
 - Turtle state
     - Visibility
-        - showturtle() | st()
-        - hideturtle() | ht()
-        - isvisible()
+        - [showturtle()](#turtleshowturtle) | [st()](#turtleshowturtle)
+        - [hideturtle()](#turtlehideturtle) | [ht()](#turtlehideturtle)
+        - [isvisible()](#turtleisvisible)
     - Appearance
-        - shape()
+        - [shape()](#turtleshapenamenone)
         - resizemode()
         - shapesize() | turtlesize()
         - shearfactor()
@@ -117,30 +122,53 @@
 Most of the examples in this section refer to a Turtle instance called `turtle`.
 
 > [!WARNING]
-> Functions with $\textcolor{#FD5E53}{\normalsize{\textsf{Red text}}}$ indicate that the function exists in [Python Turtle](https://docs.python.org/3/library/turtle.html), but is not supported by the current version of [turtle.js](https://github.com/Siyu1017/turtle.js).
+> Functions with ~~Strikethrough~~ indicate that the function exists in [Python Turtle](https://docs.python.org/3/library/turtle.html), but is not supported by the current version of [turtle.js](https://github.com/Siyu1017/turtle.js).
+
+### Methods specific to Turtle.js
+
+#### turtle.setlinecap(_type_)
+- `Parameters:` **type** - `round` ( Default ), `butt` or `square`
+- Sets how line segment ends are drawn
+
+#### turtle.setlinejoin(_type_)
+- `Parameters:` **type** - `round` ( Default ), `bevel` or `miter`
+- Set how connected parts of line segments are connected together
+
+#### turtle.seteasing(_easing_)
+- `Parameters:` **easing** - `ease`, `ease-in`, `ease-out`, `ease-in-out`, `tep-start`, `tep-end`, `linear`, `easeInQuad`, `easeOutQuad`, `easeInOutQuad`, `easeInCubic`, `easeOutCubic`, `easeInOutCubic`, `easeInQuart`, `easeOutQuart`, `easeInOutQuart`, `easeInQuint`, `easeOutQuint`, `easeInOutQuint`, `easeInSine`, `easeOutSine`, `easeInOutSine`, `easeInExpo`, `easeOutExpo`, `easeInOutExpo`, `easeInCirc`, `easeOutCirc`, `easeInOutCirc` ( Default ), `easeInBack`, `easeOutBack`, `easeInOutBack`, `easeInElastic`, `easeOutElastic`, `easeInOutElastic`, `easeInBounce`, `easeOutBounce`, `easeInOutBounce`
+- Set the easing function of turtle motion transition
+
+#### turtle.setduration(_duration_)
+- `Parameters:` **duration** - a positive number
+- Set the duration of turtle motion transition
 
 ### Turtle motion
 
 #### turtle.forward(_distance_)
 - `Parameters:` **distance** – a number (integer or float)
+- Short functions : **turtle.fd(_distance_)**
 - Move the turtle forward by the specified `distance`, in the direction the turtle is headed.
 
 #### turtle.backward(_distance_)
 - `Parameters:` **distance** – a number
+- Short functions : **turtle.bk(_distance_)**, **turtle.back(_distance_)**
 - Move the turtle backward by `distance`, opposite to the direction the turtle is headed. Do not change the turtle’s heading.
 
 #### turtle.right(_angle_)
 - `Parameters:` **angle** – a number (integer or float)
-- Turn turtle right by `angle` units. (Units are by default degrees, but can be set via the $\textcolor{#FD5E53}{\normalsize{\textsf{degrees()}}}$ and $\textcolor{#FD5E53}{\normalsize{\textsf{radians()}}}$ functions.) Angle orientation depends on the turtle mode, see $\textcolor{#FD5E53}{\normalsize{\textsf{mode()}}}$.
+- Short functions : **turtle.rt(_angle_)**
+- Turn turtle right by `angle` units. (Units are by default degrees, but can be set via the ~~degrees()~~ and ~~radians()~~ functions.) Angle orientation depends on the turtle mode, see ~~mode()~~.
 
 #### turtle.left(_angle_)
 - `Parameters:` **angle** – a number (integer or float)
-- Turn turtle left by `angle` units. (Units are by default degrees, but can be set via the $\textcolor{#FD5E53}{\normalsize{\textsf{degrees()}}}$ and $\textcolor{#FD5E53}{\normalsize{\textsf{radians()}}}$ functions.) Angle orientation depends on the turtle mode, see $\textcolor{#FD5E53}{\normalsize{\textsf{mode()}}}$.
+- Short functions : **turtle.lt(_angle_)**
+- Turn turtle left by `angle` units. (Units are by default degrees, but can be set via the ~~degrees()~~ and ~~radians()~~ functions.) Angle orientation depends on the turtle mode, see ~~mode()~~.
 
 #### turtle.goto(_x_, _y_)
 - `Parameters:` 
     - **x** – a number
     - **y** – a number
+- Short functions : **turtle.setpos(_x_, _y_)**, **turtle.setposition(_x_, _y_)**
 - Move turtle to an absolute position. If the pen is down, draw line. Do not change the turtle’s orientation.
 
 #### turtle.teleport(_x_, _y_)
@@ -159,13 +187,14 @@ Most of the examples in this section refer to a Turtle instance called `turtle`.
 
 #### turtle.setheading(_angle_)
 - `Parameters:` **angle** – a number (integer or float)
+- Short functions : **turtle.seth(_angle_)**
 - Set the orientation of the turtle to `angle`. Here are some common directions in degrees:
     | Directions | East | South | West | North |
     | :--------: | :--: | :---: | :--: | :---: |
     | Degrees    | 0    | 90    | 180  | 270   |
 
 #### turtle.home()
-- Move turtle to the origin – coordinates (0,0) – and set its heading to its start-orientation (which depends on the mode, see $\textcolor{#FD5E53}{\normalsize{\textsf{mode()}}}$).
+- Move turtle to the origin – coordinates (0,0) – and set its heading to its start-orientation (which depends on the mode, see ~~mode()~~).
 
 #### turtle.circle(_radius_, _startAngle=0_, _endAngle=360_)
 - `Parameters:`
@@ -183,6 +212,7 @@ Most of the examples in this section refer to a Turtle instance called `turtle`.
 ### Tell Turtle’s state
 
 #### turtle.position()
+- Short functions : **pos()**
 - Return the turtle’s current location (x,y) (as an object).
 
 #### turtle.xcor()
@@ -192,19 +222,22 @@ Most of the examples in this section refer to a Turtle instance called `turtle`.
 - Return the turtle’s y coordinate.
 
 #### turtle.heading()
-- Return the turtle’s current heading (value depends on the turtle mode, see $\textcolor{#FD5E53}{\normalsize{\textsf{mode()}}}$).
+- Return the turtle’s current heading (value depends on the turtle mode, see ~~mode()~~).
 
 ### Pen control
 Drawing state
 
 #### turtle.pendown()
+- Short functions : **pd()**, **down()**
 - Pull the pen down – drawing when moving.
 
 #### turtle.penup()
+- Short functions : **pu()**, **up()**
 - Pull the pen up – no drawing when moving.
 
 #### turtle.pensize(_width=None_)
 - `Parameters:` **width** – a positive number
+- Short functions : **width()**
 - Set the line thickness to `width` or return it. If no argument is given, the current penSize is returned.
 
 #### turtle.isdown()
@@ -247,7 +280,27 @@ More drawing control
 #### turtle.write(arg, move=false, align='left', font)
 - `Parameters:`
     - arg – object to be written to the TurtleScreen
-    - $\textcolor{#FD5E53}{\normalsize{\textsf{move}}}$ – True/False ( unavailable )
+    - ~~move~~ – True/False ( unavailable )
     - align – one of the strings `left`, `center` or `right`
     - font – a string using the same syntax as the CSS font property
 
+### Turtle state
+
+Visibility
+
+#### turtle.showturtle()
+- Short functions : **st()**
+- Make the turtle visible.
+
+#### turtle.hideturtle()
+- Short functions : **ht()**
+- Make the turtle invisible. It’s a good idea to do this while you’re in the middle of doing some complex drawing, because hiding the turtle speeds up the drawing observably.
+
+#### turtle.isvisible()
+- Return `True` if the Turtle is shown, `False` if it’s hidden.
+
+Appearance
+
+#### turtle.shape(_name=None_)
+- `Parameters:` **name** – a string which is a valid shapename
+- Set turtle shape to shape with given `name` or, if name is not given, return name of current shape. Shape with `name` must exist in the TurtleScreen’s shape dictionary. Initially there are the following polygon shapes: `arrow`, `turtle`, `circle`, `square`, `triangle`, `classic`. 

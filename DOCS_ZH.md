@@ -2,19 +2,24 @@
 
 ## 目錄
 
-### Turtle 方法
+### Turtle.js 特有方法
+- [setlinecap()](#turtlesetlinecaptype)
+- [setlinejoin()](#turtlesetlinejointype)
+- [seteasing()](#turtleseteasingeasing)
+- [setduration()](#turtlesetdurationduration)
 
+### Turtle 方法
 - Turtle 動作
     - 移動和繪製
-        - [forward()](#turtleforwarddistance) | fd()
-        - [backward()](#turtlebackwarddistance) | bk() | back()
-        - [right()](#turtlerightangle) | rt()
-        - [left()](#turtleleftangle) | lt()
-        - [goto()](#turtlegotox-y) | setpos() | setposition()
+        - [forward()](#turtleforwarddistance) | [fd()](#turtleforwarddistance)
+        - [backward()](#turtlebackwarddistance) | [bk()](#turtlebackwarddistance) | [back()](#turtlebackwarddistance)
+        - [right()](#turtlerightangle) | [rt()](#turtlerightangle)
+        - [left()](#turtleleftangle) | [lt()](#turtleleftangle)
+        - [goto()](#turtlegotox-y) | [setpos()](#turtlegotox-y) | [setposition()](#turtlegotox-y)
         - [teleport()](#turtleteleportx-y)
         - [setx()](#turtlesetxx)
         - [sety()](#turtlesetyy)
-        - [setheading()](#turtlesetheadingangle) | seth()
+        - [setheading()](#turtlesetheadingangle) | [seth()](#turtlesetheadingangle)
         - [home()](#turtlehome)
         - [circle()](#turtlecircleradius-startangle0-endangle360)
         - [dot()](#turtledotsize-color)
@@ -24,7 +29,7 @@
         - undo()
         - speed()
     - 獲取 turtle 的狀態
-        - [position()](#turtleposition) | pos()
+        - [position()](#turtleposition) | [pos()](#turtleposition)
         - towards()
         - [xcor()](#turtlexcor)
         - [ycor()](#turtleycor)
@@ -35,9 +40,9 @@
         - radians()
 - 畫筆控制
     - 繪圖狀態
-        - [pendown()](#turtlependown) | pd() | down()
-        - [penup()](#turtlepenup) | pu() | up()
-        - [pensize()](#turtlepensizewidthnone) | width()
+        - [pendown()](#turtlependown) | [pd()](#turtlependown) | [down()](#turtlependown)
+        - [penup()](#turtlepenup) | [pu()](#turtlepenup) | [up()](#turtlepenup)
+        - [pensize()](#turtlepensizewidthnone) | [width()](#turtlepensizewidthnone)
         - pen()
         - [isdown()](#turtleisdown)
     - 顏色控制
@@ -54,11 +59,11 @@
         - [write()](#turtlewritearg-movefalse-alignleft-font)
 - Turtle 狀態
     - 可見性
-        - showturtle() | st()
-        - hideturtle() | ht()
-        - isvisible()
+        - [showturtle()](#turtleshowturtle) | [st()](#turtleshowturtle)
+        - [hideturtle()](#turtlehideturtle) | [ht()](#turtlehideturtle)
+        - [isvisible()](#turtleisvisible)
     - 外觀
-        - shape()
+        - [shape()](#turtleshapenamenone)
         - resizemode()
         - shapesize() | turtlesize()
         - shearfactor()
@@ -117,30 +122,53 @@
 本節中的大部分示例都使用 Turtle 類的一個實例，命名為 `turtle`。
 
 > [!WARNING] 
-> 使用 $\textcolor{#FD5E53}{\normalsize{\textsf{紅色文字}}}$ 的函數代表 [Python Turtle](https://docs.python.org/3/library/turtle.html) 支持該函數，但目前版本 [turtle.js](https://github.com/Siyu1017/turtle.js) 並不支持
+> 使用 ~~刪除線~~ 的函數代表 [Python Turtle](https://docs.python.org/3/library/turtle.html) 支持該函數，但目前版本 [turtle.js](https://github.com/Siyu1017/turtle.js) 並不支持
+
+### Turtle.js 特有方法
+
+#### turtle.setlinecap(_type_)
+- `Parameters:` **type** - `round` ( 預設 ), `butt` 或 `square`
+- 設定如何繪製線段末端
+
+#### turtle.setlinejoin(_type_)
+- `Parameters:` **type** - `round` ( 預設 ), `bevel` 或 `miter`
+- 設定線段的連接部分如何連接在一起
+
+#### turtle.seteasing(_easing_)
+- `Parameters:` **easing** - `ease`, `ease-in`, `ease-out`, `ease-in-out`, `tep-start`, `tep-end`, `linear`, `easeInQuad`, `easeOutQuad`, `easeInOutQuad`, `easeInCubic`, `easeOutCubic`, `easeInOutCubic`, `easeInQuart`, `easeOutQuart`, `easeInOutQuart`, `easeInQuint`, `easeOutQuint`, `easeInOutQuint`, `easeInSine`, `easeOutSine`, `easeInOutSine`, `easeInExpo`, `easeOutExpo`, `easeInOutExpo`, `easeInCirc`, `easeOutCirc`, `easeInOutCirc` ( 預設 ), `easeInBack`, `easeOutBack`, `easeInOutBack`, `easeInElastic`, `easeOutElastic`, `easeInOutElastic`, `easeInBounce`, `easeOutBounce`, `easeInOutBounce`
+- 設定 turtle 運動過渡的 easing 函數
+
+#### turtle.setduration(_duration_)
+- `Parameters:` **duration** - 一個正數
+- 設定 turtle 運動過渡的持續時間
 
 ### Turtle 方法
 
 #### turtle.forward(_distance_)
 - `Parameters:` **distance** – 一個數值 ( 整數或浮點型 )
+- 短函數 : **turtle.fd(_distance_)**
 - 移動 turtle 前進指定 `distance` 距離，方向為 turtle 的朝向。
 
 #### turtle.backward(_distance_)
 - `Parameters:` **distance** – 一個數值
+- 短函數 : **turtle.bk(_distance_)**, **turtle.back(_distance_)**
 - 移動 turtle 後退指定 `distance` 距離，方向與 turtle 的朝向相反。不改變 turtle 的方向。
 
 #### turtle.right(_angle_)
 - `Parameters:` **angle** – 一個數值 ( 整數或浮點型 )
--  turtle 右轉 `angle` 個單位。( 單位預設為角度，但可透過 $\textcolor{#FD5E53}{\normalsize{\textsf{degrees()}}}$ 和 $\textcolor{#FD5E53}{\normalsize{\textsf{radians()}}}$ 函數改變設定。) 角度的正負由 turtle 模式決定，參見 $\textcolor{#FD5E53}{\normalsize{\textsf{mode()}}}$。
+- 短函數 : **turtle.rt(_angle_)**
+-  turtle 右轉 `angle` 個單位。( 單位預設為角度，但可透過 ~~degrees()~~ 和 ~~radians()~~ 函數改變設定。) 角度的正負由 turtle 模式決定，參見 ~~mode()~~。
 
 #### turtle.left(_angle_)
 - `Parameters:` **angle** – 一個數值 ( 整數或浮點型 )
-- turtle 左轉 `angle` 個單位。 ( 單位預設為角度，但可透過 $\textcolor{#FD5E53}{\normalsize{\textsf{degrees()}}}$ 和 $\textcolor{#FD5E53}{\normalsize{\textsf{radians()}}}$ 函數改變設定。) 角度的正負由 turtle 模式決定，參見 $\textcolor{#FD5E53}{\normalsize{\textsf{mode()}}}$。
+- 短函數 : **turtle.lt(_angle_)**
+- turtle 左轉 `angle` 個單位。 ( 單位預設為角度，但可透過 ~~degrees()~~ 和 ~~radians()~~ 函數改變設定。) 角度的正負由 turtle 模式決定，參見 ~~mode()~~。
 
 #### turtle.goto(_x_, _y_)
 - `Parameters:` 
     - **x** – 一個數值
     - **y** – 一個數值
+- 短函數 : **turtle.setpos(_x_, _y_)**, **turtle.setposition(_x_, _y_)**
 - 將 turtle 移動到絕對位置。若已下筆則會畫線。不改變 turtle 的方向。
 
 #### turtle.teleport(_x_, _y_)
@@ -159,13 +187,14 @@
 
 #### turtle.setheading(_angle_)
 - `Parameters:` **angle** – 一個數值 ( 整數或浮點型 )
+- 短函數 : **turtle.seth(_angle_)**
 - 將 turtle 的方向設定為 `angle`。以下是一些常見的度數方向：
     | 方向 | 東  | 南  | 西   | 北   |
     | :--: | :-: | :-: | :--: | :--: |
     | 度數 | 0   | 90  | 180  | 270  |
 
 #### turtle.home()
-- 將 turtle 移到原點 – 座標(0,0) – 並將其 heading 設為起始方向 ( 這取決於模式，請參閱 $\textcolor{#FD5E53}{\normalsize{\textsf{mode()}}}$ )。
+- 將 turtle 移到原點 – 座標(0,0) – 並將其 heading 設為起始方向 ( 這取決於模式，請參閱 ~~mode()~~ )。
 
 #### turtle.circle(_radius_, _startAngle=0_, _endAngle=360_)
 - `Parameters:`
@@ -183,6 +212,7 @@
 ### 獲取 turtle 的狀態
 
 #### turtle.position()
+- 短函數 : **pos()**
 - 傳回 turtle 目前的座標(x,y) ( 為一個Object )。
 
 #### turtle.xcor()
@@ -192,19 +222,22 @@
 - 傳回 turtle 的 y 座標。
 
 #### turtle.heading()
-- 返回 turtle 目前的朝向 ( 數值受 turtle 模式影響，參見 $\textcolor{#FD5E53}{\normalsize{\textsf{mode()}}}$ ).
+- 返回 turtle 目前的朝向 ( 數值受 turtle 模式影響，參見 ~~mode()~~ ).
 
 ### 畫筆控制
 繪圖狀態
 
 #### turtle.pendown()
+- 短函數 : **pd()**, **down()**
 - 下筆 – 移動時畫線。
 
 #### turtle.penup()
+- 短函數 : **pu()**, **up()**
 - 提筆 – 移動時不畫線。
 
 #### turtle.pensize(_width=None_)
 - `Parameters:` **width** – 一個正數
+- 短函數 : **width()**
 - 設定筆畫線條的粗細為 `width` 或傳回該值。如未指定參數，則傳回目前的penSize。
 
 #### turtle.isdown()
@@ -247,8 +280,27 @@
 #### turtle.write(arg, move=false, align='left', font)
 - `Parameters:`
     - arg – 要書寫到 TurtleScreen 的對象
-    - $\textcolor{#FD5E53}{\normalsize{\textsf{move}}}$ – True/False ( 不可用 )
+    - ~~move~~ – True/False ( 不可用 )
     - align – 為 `left` 、 `center` 或 `right` 字串中的一個
     - font – 使用與 CSS font 屬性相同語法的字串
 
-    
+### Turtle 狀態
+
+可見性
+
+#### turtle.showturtle()
+- 短函數 : **st()**
+- 使 turtle 可見。
+
+#### turtle.hideturtle()
+- 短函數 : **ht()**
+- 使 turtle 不可見。當你繪製複雜圖形時這是個好主意，因為隱藏 turtle 可顯著加快繪製速度。
+
+#### turtle.isvisible()
+- 如果顯示 turtle 則傳 `True`，如果隱藏則傳回 `False`。
+
+外觀
+
+#### turtle.shape(_name=None_)
+- `Parameters:` **name** – 一個有效的 shape 名稱的字串
+- 將海龜形狀設定為具有給定 `name` 的形狀，或者，如果未給予名稱，則傳回目前形狀的名稱。帶有 `name` 的形狀必須存在於 shapes 中。多邊形的形狀初始時有以下幾種： `arrow`, `turtle`, `circle`, `square`, `triangle`, `classic`。

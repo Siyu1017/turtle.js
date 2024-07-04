@@ -1,136 +1,449 @@
 'use strict';
 
 import pkg from '../package.json';
+import useEasing from './useEasing';
 
 class turtle {
-    defaultstate = {
+    version = pkg.version;
+    defaultState = {
         penDown: true,
         filling: false,
-        shape: 'turtle',
-        size: 10,
-        color: '#000',
-        fillColor: '#000',
-        penSize: 1,
         position: {
             x: 0,
             y: 0
         },
         heading: 0
+    }
+    defaultConfig = {
+        shape: 'classic',
+        shapeSize: 18,
+        shapeColor: '#000',
+        shapeVisible: true,
+        penSize: 1,
+        penColor: '#000',
+        fillColor: '#000',
+        backgroundColor: '#fff',
+        animateDuration: 500,
+        easingFunction: 'easeInOutCirc',
+        lineCap: 'round',
+        lineJoin: 'round'
+    }
+    config = {
+        shape: 'classic',
+        shapeSize: 18,
+        shapeColor: '#000',
+        shapeVisible: true,
+        penSize: 1,
+        penColor: '#000',
+        fillColor: '#000',
+        backgroundColor: '#fff',
+        animateDuration: 500,
+        easingFunction: 'easeInOutCirc',
+        lineCap: 'round',
+        lineJoin: 'round'
     }
     state = {
         penDown: true,
         filling: false,
-        shape: 'turtle',
-        size: 10,
-        color: '#000',
-        fillColor: '#000',
-        penSize: 1,
         position: {
             x: 0,
             y: 0
         },
         heading: 0
     }
+    shapes = {
+        "arrow": {
+            type: "polygon",
+            points: [[-10, 0], [10, 0], [0, 10]]
+        },
+        "turtle": {
+            type: "polygon",
+            points: [
+                [0, 16], [-2, 14], [-1, 10], [-4, 7],
+                [-7, 9], [-9, 8], [-6, 5], [-7, 1], [-5, -3], [-8, -6],
+                [-6, -8], [-4, -5], [0, -7], [4, -5], [6, -8], [8, -6],
+                [5, -3], [7, 1], [6, 5], [9, 8], [7, 9], [4, 7], [1, 10],
+                [2, 14]
+            ]
+        },
+        "circle": {
+            type: "polygon",
+            points: [
+                [10, 0], [9.51, 3.09], [8.09, 5.88],
+                [5.88, 8.09], [3.09, 9.51], [0, 10], [-3.09, 9.51],
+                [-5.88, 8.09], [-8.09, 5.88], [-9.51, 3.09], [-10, 0],
+                [-9.51, -3.09], [-8.09, -5.88], [-5.88, -8.09],
+                [-3.09, -9.51], [-0.00, -10.00], [3.09, -9.51],
+                [5.88, -8.09], [8.09, -5.88], [9.51, -3.09]
+            ]
+        },
+        "square": {
+            type: "polygon",
+            points: [[10, -10], [10, 10], [-10, 10], [-10, -10], [10, -10]]
+        },
+        "triangle": {
+            type: "polygon",
+            points: [[10, -5.77], [0, 11.55], [-10, -5.77]]
+        },
+        "classic": {
+            type: "polygon",
+            points: [[0, 0], [-5, -9], [0, -7], [5, -9]]
+        }
+    }
+    actionQueue = [];
+    imageData = null;
+    currentHeading = 0;
     constructor(canvas) {
         this.canvas = canvas;
-        this.ctx = this.canvas.getContext('2d');
+        this.ctx = this.canvas.getContext('2d', { willReadFrequently: true });
         canvasClarifier(this.canvas, this.ctx);
-        /*
-        this.ctx.arc(this.canvas.offsetWidth / 2, this.canvas.offsetHeight / 2, 5, 0, Math.PI * 2);
-        this.ctx.fill();
-        */
-        this.goto(this.canvas.offsetWidth / 2, this.canvas.offsetHeight / 2);
+        this.state.position = {
+            x: this.canvas.offsetWidth / 2,
+            y: this.canvas.offsetHeight / 2
+        };
         this.pendown();
+
+        var lastTime = Date.now();
+        var currentAction = 0;
+
+        /*
+        function drawShape() {
+            this.ctx.save();
+            this.ctx.beginPath();
+            this.ctx.translate(this.state.position.x, this.state.position.y);
+            this.ctx.rotate((this.state.heading + 90) * Math.PI / 180);
+            const storkeWidth = 1;
+            this.ctx.strokeWidth = storkeWidth;
+            this.ctx.moveTo(0, -this.config.shapeSize / 2 + storkeWidth);
+            this.ctx.lineTo(-this.config.shapeSize / 2 + storkeWidth, this.config.shapeSize / 2 - storkeWidth);
+            this.ctx.lineTo(0, this.config.shapeSize / 2 / 2);
+            this.ctx.lineTo(this.config.shapeSize / 2 - storkeWidth, this.config.shapeSize / 2 - storkeWidth);
+            this.ctx.lineTo(0, -this.config.shapeSize / 2 + storkeWidth);
+            this.ctx.fillStyle = this.config.shapeColor;
+            this.ctx.closePath();
+            this.ctx.fill();
+            this.ctx.restore();
+        }
+            */
+
+        var noAnimationActions = []
+
+        function drawShape(name) {
+            this.ctx.save();
+            if (!this.shapes[name]) {
+                name = 'classic';
+            }
+            var points = [...this.shapes[name].points];
+            var path = new Path2D();
+            path.moveTo(points[0][0], points[0][1]);
+            points.shift();
+            points.forEach(arr => {
+                path.lineTo(arr[0], arr[1]);
+            })
+            this.ctx.translate(this.state.position.x, this.state.position.y);
+            this.ctx.rotate((this.state.heading - 90) * Math.PI / 180);
+            this.ctx.fill(path);
+            this.ctx.restore();
+        }
+
+        function runAction(action) {
+            function capitalizeFirstLetter(string) {
+                return string.charAt(0).toUpperCase() + string.slice(1);
+            }
+
+            var transitionActionsWithDistance = ['forward', 'backward'];
+            var transitionActionsWithCoordinate = ['goto'];
+            var transitionActionsWithAngle = ['left', 'right'];
+
+            this.restoreImageData();
+            this.ctx.save();
+            this.ctx.lineWidth = this.config.penSize;
+            this.ctx.lineCap = this.config.lineCap;
+            this.ctx.lineJoin = this.config.lineJoin;
+            var useTransition = false;
+            if (transitionActionsWithAngle.includes(action.name)) {
+                useTransition = true;
+                if (action.name == 'left') {
+                    this.currentHeading -= Object.values(action.args)[0];
+                } else {
+                    this.currentHeading += Object.values(action.args)[0];
+                }
+                useEasing(this.config.easingFunction, action.func, {
+                    value: 0
+                }, action.args, this.config.animateDuration, this, {
+
+                })
+            } else if (transitionActionsWithCoordinate.includes(action.name)) {
+                useTransition = true;
+                useEasing(this.config.easingFunction, action.func, this.state.position, action.args, this.config.animateDuration, this, {
+                    mode: 'based',
+                });
+            } else if (transitionActionsWithDistance.includes(action.name)) {
+                useTransition = true;
+                useEasing(this.config.easingFunction, action.func, {
+                    value: 0
+                }, action.args, this.config.animateDuration, this, {
+
+                });
+            } else if (action.func) {
+                action.func.apply(this, Object.values(action.args));
+            }
+            if (!useTransition) {
+                this.ctx.restore();
+                this.saveImageData();
+            }
+        }
+
+        function checkAction() {
+            if (this.actionQueue.length > 0 && currentAction < this.actionQueue.length) {
+                runAction(this.actionQueue[currentAction]);
+                currentAction++;
+                if (this.actionQueue.length > 0 && currentAction < this.actionQueue.length) {
+                    if (this.actionQueue[currentAction].type == 'control' || this.actionQueue[currentAction].type == 'state' || this.actionQueue[currentAction].type == 'teleport') {
+                        checkAction();
+                    }
+                }
+                // this.actionQueue.shift();
+            }
+        }
+
+        function animate() {
+            canvasClarifier(this.canvas, this.ctx);
+            if (Date.now() - lastTime > this.config.animateDuration) {
+                checkAction();
+                lastTime = Date.now();
+            }
+            this.restoreImageData();
+            if (this.config.shapeVisible == true) {
+                drawShape(this.config.shape);
+            }
+            requestAnimationFrame(() => animate());
+        }
+        checkAction = checkAction.bind(this);
+        runAction = runAction.bind(this);
+        drawShape = drawShape.bind(this);
+        animate = animate.bind(this);
+        animate();
+    }
+
+    saveImageData() {
+        this.imageData = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
+        return this;
+    }
+    restoreImageData() {
+        if (this.imageData) this.ctx.putImageData(this.imageData, 0, 0);
+        return this;
+    }
+    // Methods specific to Turtle.js
+    setlinecap(type) {
+        this.actionQueue.push({
+            type: 'control',
+            name: 'setlinecap',
+            args: [type],
+            func: function (type) {
+                this.config.lineCap = type;
+            }
+        })
+    }
+    setlinejoin(type) {
+        this.actionQueue.push({
+            type: 'control',
+            name: 'setlinejoin',
+            args: [type],
+            func: function (type) {
+                this.config.lineJoin = type;
+            }
+        })
+    }
+    seteasing(easing) {
+        this.actionQueue.push({
+            type: 'control',
+            name: 'seteasing',
+            args: [easing],
+            func: function (easing) {
+                if (!parseEasingFunction(false).includes(easing)) {
+                    return console.warn(`setheading(type)\ntypes : ${parseEasingFunction(false).join(', ')}`);
+                }
+                this.config.easingFunction = easing;
+            }
+        })
+    }
+    setduration(duration) {
+        this.actionQueue.push({
+            type: 'control',
+            name: 'setduration',
+            args: [duration],
+            func: function (duration) {
+                this.config.animateDuration = duration;
+            }
+        })
     }
     // Actions
     forward(value) {
-        const theta = Math.PI / 180 * (this.state.heading % 90);
-        if (this.state.heading < 90 && this.state.heading > 0) {
-            this.state.position.x += Math.cos(theta) * value;
-            this.state.position.y += Math.sin(theta) * value;
-        } else if (this.state.heading > 270 && this.state.heading < 360) {
-            this.state.position.x += Math.sin(theta) * value;
-            this.state.position.y -= Math.cos(theta) * value;
-        } else if (this.state.heading > 90 && this.state.heading < 180) {
-            this.state.position.x -= Math.sin(theta) * value;
-            this.state.position.y += Math.cos(theta) * value;
-        } else if (this.state.heading > 180 && this.state.heading < 270) {
-            this.state.position.x -= Math.cos(theta) * value;
-            this.state.position.y -= Math.sin(theta) * value;
-        } else {
-            if (this.state.heading == 90) {
-                this.state.position.y += value;
-            } else if (this.state.heading == 180) {
-                this.state.position.x -= value;
-            } else if (this.state.heading == 270) {
-                this.state.position.y -= value;
-            } else {
-                this.state.position.x += value;
+        this.actionQueue.push({
+            name: 'forward',
+            args: [value],
+            func: function (value) {
+                this.restoreImageData();
+                this.ctx.save();
+                this.ctx.lineWidth = this.config.penSize;
+                this.ctx.lineCap = this.config.lineCap;
+                this.ctx.lineJoin = this.config.lineJoin;
+                this.ctx.moveTo(this.state.position.x, this.state.position.y);
+                const theta = Math.PI / 180 * (this.currentHeading % 90);
+                if (this.currentHeading < 90 && this.currentHeading > 0) {
+                    this.state.position.x += Math.cos(theta) * value;
+                    this.state.position.y += Math.sin(theta) * value;
+                } else if (this.currentHeading > 270 && this.currentHeading < 360) {
+                    this.state.position.x += Math.sin(theta) * value;
+                    this.state.position.y -= Math.cos(theta) * value;
+                } else if (this.currentHeading > 90 && this.currentHeading < 180) {
+                    this.state.position.x -= Math.sin(theta) * value;
+                    this.state.position.y += Math.cos(theta) * value;
+                } else if (this.currentHeading > 180 && this.currentHeading < 270) {
+                    this.state.position.x -= Math.cos(theta) * value;
+                    this.state.position.y -= Math.sin(theta) * value;
+                } else {
+                    if (this.currentHeading == 90) {
+                        this.state.position.y += value;
+                    } else if (this.currentHeading == 180) {
+                        this.state.position.x -= value;
+                    } else if (this.currentHeading == 270) {
+                        this.state.position.y -= value;
+                    } else {
+                        this.state.position.x += value;
+                    }
+                }
+                this.ctx.lineTo(this.state.position.x, this.state.position.y);
+                if (this.state.penDown == true) {
+                    this.ctx.stroke();
+                }
+                this.ctx.restore();
+                this.saveImageData();
             }
-        }
-        this.ctx.lineTo(this.state.position.x, this.state.position.y);
-        if (this.state.penDown == true) {
-            this.ctx.stroke();
-        }
+        })
     }
     backward(value) {
         return this.forward(-value);
     }
     right(value) {
-        this.state.heading += value;
-        if (this.state.heading > 360) {
-            this.state.heading = this.state.heading % 360;
-        }
+        this.actionQueue.push({
+            name: 'right',
+            args: [value],
+            func: function (value) {
+                this.state.heading += value;
+                if (this.state.heading > 360) {
+                    this.state.heading = this.state.heading % 360;
+                }
+            }
+        })
     }
     left(value) {
-        this.state.heading -= value;
-        if (this.state.heading < 0) {
-            this.state.heading = this.state.heading % 360;
-        }
+        this.actionQueue.push({
+            name: 'left',
+            args: [value],
+            func: function (value) {
+                this.state.heading -= value;
+                if (this.state.heading < 0) {
+                    this.state.heading = this.state.heading % 360;
+                }
+            }
+        })
     }
     goto(x, y) {
-        this.state.position.x = x;
-        this.state.position.y = y;
-        this.ctx.moveTo(this.state.position.x, this.state.position.y);
-        if (this.state.penDown == true) {
-            this.ctx.stroke();
-        }
+        this.actionQueue.push({
+            name: 'goto',
+            args: [x, y],
+            func: function (x, y) {
+                this.state.position.x = x;
+                this.state.position.y = y;
+                this.ctx.moveTo(this.state.position.x, this.state.position.y);
+                if (this.state.penDown == true) {
+                    this.ctx.stroke();
+                }
+            }
+        })
     }
     teleport(x, y) {
-        this.state.position.x = x;
-        this.state.position.y = y;
-        this.ctx.moveTo(this.state.position.x, this.state.position.y);
+        this.actionQueue.push({
+            type: 'teleport',
+            name: 'teleport',
+            args: [x, y],
+            func: function (x, y) {
+                this.state.position.x = x;
+                this.state.position.y = y;
+                this.ctx.moveTo(this.state.position.x, this.state.position.y);
+            }
+        })
     }
     setx(value) {
-        this.state.position.x = value;
-        this.ctx.moveTo(this.state.position.x, this.state.position.y);
+        this.actionQueue.push({
+            name: 'setx',
+            args: [value],
+            func: function (value) {
+                this.state.position.x = value;
+                this.ctx.moveTo(this.state.position.x, this.state.position.y);
+            }
+        })
     }
     sety(value) {
-        this.state.position.y = value;
-        this.ctx.moveTo(this.state.position.x, this.state.position.y);
+        this.actionQueue.push({
+            name: 'sety',
+            args: [value],
+            func: function (value) {
+                this.state.position.y = value;
+                this.ctx.moveTo(this.state.position.x, this.state.position.y);
+            }
+        })
     }
     setheading(angle) {
-        this.state.heading = angle;
+        this.actionQueue.push({
+            name: 'setheading',
+            args: [angle],
+            func: function (angle) {
+                this.state.heading = angle;
+            }
+        })
     }
     home() {
-        this.teleport(this.canvas.offsetWidth / 2, this.canvas.offsetHeight / 2);
-        this.state.heading = 0;
+        this.actionQueue.push({
+            name: 'home',
+            args: [],
+            func: function () {
+                this.state.position.x = this.canvas.offsetWidth / 2;
+                this.state.position.y = this.canvas.offsetHeight / 2;
+                this.ctx.moveTo(this.state.position.x, this.state.position.y);
+                this.state.heading = 0;
+            }
+        })
     }
     circle(radius, startAngle = 0, endAngle = 360) {
-        this.ctx.arc(this.state.position.x, this.state.position.y, radius, Math.PI / 180 * startAngle, Math.PI / 180 * endAngle);
-        this.ctx.stroke();
+        this.actionQueue.push({
+            name: 'circle',
+            args: [radius, startAngle, endAngle],
+            func: function (radius, startAngle = 0, endAngle = 360) {
+                this.ctx.arc(this.state.position.x, this.state.position.y, radius, Math.PI / 180 * startAngle, Math.PI / 180 * endAngle);
+                this.ctx.stroke();
+            }
+        })
     }
     dot(size, color) {
-        if (!size || size <= 0) {
-            size = Math.max(this.state.penSize + 4, this.state.penSize * 2);
-        }
-        this.ctx.save();
-        this.ctx.beginPath();
-        this.ctx.fillStyle = color;
-        this.ctx.arc(this.state.position.x, this.state.position.y, size, 0, Math.PI * 2);
-        this.ctx.fill();
-        this.ctx.closePath();
-        this.ctx.restore();
+        this.actionQueue.push({
+            name: 'dot',
+            args: [size, color],
+            func: function (size, color) {
+                if (!size || size <= 0) {
+                    size = Math.max(this.config.penSize + 4, this.config.penSize * 2);
+                }
+                this.ctx.save();
+                this.ctx.beginPath();
+                this.ctx.fillStyle = color;
+                this.ctx.arc(this.state.position.x, this.state.position.y, size, 0, Math.PI * 2);
+                this.ctx.fill();
+                this.ctx.closePath();
+                this.ctx.restore();
+            }
+        })
     }
     stamp() {
         return unsupported('stamp');
@@ -152,22 +465,50 @@ class turtle {
     }
     // state
     position() {
-        return {
-            x: this.state.position.x,
-            y: this.state.position.y
-        };
+        this.actionQueue.push({
+            type: 'state',
+            name: 'position',
+            args: [],
+            func: function () {
+                return {
+                    x: this.state.position.x,
+                    y: this.state.position.y
+                };
+            }
+        })
     }
     towards() {
         return unsupported('towards');
     }
     xcor() {
-        return this.state.position.x;
+        this.actionQueue.push({
+            type: 'state',
+            name: 'xcor',
+            args: [],
+            func: function () {
+                return this.state.position.x;
+            }
+        })
     }
     ycor() {
-        return this.state.position.y;
+        this.actionQueue.push({
+            type: 'state',
+            name: 'ycor',
+            args: [],
+            func: function () {
+                return this.state.position.y;
+            }
+        })
     }
     heading() {
-        return this.state.heading;
+        this.actionQueue.push({
+            type: 'state',
+            name: 'heading',
+            args: [],
+            func: function () {
+                return this.state.heading;
+            }
+        })
     }
     distance() {
         return unsupported('distance');
@@ -181,84 +522,206 @@ class turtle {
     }
     // Control
     pendown() {
-        this.state.penDown = true;
-        this.updatestate();
+        this.actionQueue.push({
+            type: 'control',
+            name: 'pendown',
+            args: [],
+            func: function () {
+                this.state.penDown = true;
+                this.updatestate();
+            }
+        })
     }
     penup() {
-        this.state.penDown = false;
-        this.updatestate();
+        this.actionQueue.push({
+            type: 'control',
+            name: 'penup',
+            args: [],
+            func: function () {
+                this.state.penDown = false;
+                this.updatestate();
+            }
+        })
     }
     pensize(width) {
-        if (!width) return this.state.penSize;
-        if (width <= 0) return;
-        this.state.penSize = width;
-        this.updatestate();
+        this.actionQueue.push({
+            type: 'control',
+            name: 'pensize',
+            args: [width],
+            func: function (width) {
+                if (!width) return this.config.penSize;
+                if (width <= 0) return;
+                this.config.penSize = width;
+                this.updatestate();
+            }
+        })
     }
     pen() {
         return unsupported('pen');
     }
     isdown() {
-        return this.state.penDown;
+        this.actionQueue.push({
+            type: 'state',
+            name: 'isdown',
+            args: [],
+            func: function () {
+                return this.state.penDown;
+            }
+        })
     }
     pencolor(color) {
-        if (!color) return this.state.color;
-        this.state.color = color;
-        this.updatestate();
+        this.actionQueue.push({
+            type: 'control',
+            name: 'pencolor',
+            args: [color],
+            func: function (color) {
+                if (!color) return this.config.penColor;
+                this.config.penColor = color;
+                this.updatestate();
+            }
+        })
     }
     fillcolor(color) {
-        if (!color) return this.state.fillColor;
-        this.state.fillColor = color;
-        this.updatestate();
+        this.actionQueue.push({
+            type: 'control',
+            name: 'fillcolor',
+            args: [color],
+            func: function (color) {
+                if (!color) return this.config.fillColor;
+                this.config.fillColor = color;
+                this.updatestate();
+            }
+        })
     }
     color(color) {
-        if (!color) {
-            return {
-                pencolor: this.state.color,
-                fillcolor: this.state.fillColor
-            };
-        }
-        this.pencolor(color);
-        this.fillcolor(color);
+        this.actionQueue.push({
+            type: 'control',
+            name: 'color',
+            args: [color],
+            func: function (color) {
+                if (!color) {
+                    return {
+                        pencolor: this.config.penColor,
+                        fillcolor: this.config.fillColor
+                    };
+                }
+                this.pencolor(color);
+                this.fillcolor(color);
+            }
+        })
     }
     filling() {
-        return this.state.filling;
+        this.actionQueue.push({
+            type: 'state',
+            name: 'filling',
+            args: [],
+            func: function () {
+                return this.state.filling;
+            }
+        })
     }
     begin_fill() {
-        this.state.filling = true;
-        this.updatestate();
+        this.actionQueue.push({
+            type: 'control',
+            name: 'begin_fill',
+            args: [],
+            func: function () {
+                this.state.filling = true;
+                this.updatestate();
+            }
+        })
     }
     end_fill() {
-        this.state.filling = false;
-        this.updatestate();
+        this.actionQueue.push({
+            type: 'control',
+            name: 'end_fill',
+            args: [],
+            func: function () {
+                this.ctx.save();
+                this.ctx.fillStyle = this.config.fillColor;
+                this.ctx.closePath();
+                this.ctx.fill();
+                this.ctx.restore();
+                this.state.filling = false;
+                this.updatestate();
+            }
+        })
     }
     reset() {
-        canvasClarifier(this.canvas, this.ctx);
-        this.state = this.defaultstate();
-        this.updatestate();
-        this.home();
+        this.actionQueue.push({
+            type: 'control',
+            name: 'reset',
+            args: [],
+            func: function () {
+                canvasClarifier(this.canvas, this.ctx);
+                // this.imageData = null;
+                this.state = this.defaultState;
+                this.config = this.defaultConfig;
+                this.state.position.x = this.canvas.offsetWidth / 2;
+                this.state.position.y = this.canvas.offsetHeight / 2;
+                this.ctx.moveTo(this.state.position.x, this.state.position.y);
+                this.state.heading = 0;
+                this.updatestate();
+            }
+        })
     }
     clear() {
         return unsupported('clear');
     }
     write(arg, move = false, align = 'left', font) {
-        this.ctx.font = font;
-        this.ctx.textAlign = align;
-        this.ctx.fillStyle = this.state.color;
-        this.ctx.fillText(arg, this.state.position.x, this.state.position.y);
+        this.actionQueue.push({
+            name: 'write',
+            args: [arg, move, align, font],
+            func: function (arg, move = false, align = 'left', font) {
+                this.ctx.font = font;
+                this.ctx.textAlign = align;
+                this.ctx.fillStyle = this.config.penColor;
+                this.ctx.fillText(arg, this.state.position.x, this.state.position.y);
+            }
+        })
     }
     // Visibility
     showturtle() {
-        return unsupported('showturtle');
+        this.actionQueue.push({
+            type: 'control',
+            name: 'showturtle',
+            args: [],
+            func: function () {
+                this.config.shapeVisible = true;
+            }
+        })
     }
     hideturtle() {
-        return unsupported('hideturtle');
+        this.actionQueue.push({
+            type: 'control',
+            name: 'hideturtle',
+            args: [],
+            func: function () {
+                this.config.shapeVisible = false;
+            }
+        })
     }
     isvisible() {
-        return unsupported('isvisible');
+        this.actionQueue.push({
+            type: 'state',
+            name: 'isvisibl',
+            args: [],
+            func: function () {
+                return this.config.shapeVisible;
+            }
+        })
     }
     // Appearance
     shape(name) {
-        return unsupported('shape');
+        this.actionQueue.push({
+            type: 'control',
+            name: 'shape',
+            args: [name],
+            func: function (name) {
+                if (!name) return this.config.shape;
+                this.config.shape = name;
+            }
+        })
     }
     resizemode(mode) {
         return unsupported('resizemode');
@@ -286,11 +749,29 @@ class turtle {
     }
     // Update state
     updatestate() {
-        this.ctx.strokeStyle = this.state.color;
-        this.ctx.lineWidth = this.state.penSize;
-        this.ctx.fillStyle = this.state.fillColor;
+        this.ctx.strokeStyle = this.config.penColor;
+        this.ctx.lineWidth = this.config.penSize;
+        this.ctx.fillStyle = this.config.fillColor;
     }
     // Events
+    // -------------------------------------------------------------- //
+    // Short functions
+    fd = this.forward;
+    bk = this.backward;
+    back = this.backward;
+    rt = this.right;
+    lt = this.left;
+    setpos = this.goto;
+    setposition = this.goto;
+    seth = this.setheading;
+    pos = this.position;
+    pd = this.pendown;
+    down = this.pendown;
+    pu = this.penup;
+    up = this.penup;
+    width = this.pensize;
+    st = this.showturtle;
+    ht = this.hideturtle;
 }
 
 export default turtle;

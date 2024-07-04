@@ -6,6 +6,7 @@ JavaScript version of turtle graphics
 [![npm bundle size](https://img.shields.io/bundlephobia/minzip/@siyu971017/turtle.js?style=flat-square)](https://bundlephobia.com/package/@siyu971017/turtle.js@latest)
 [![npm downloads](https://img.shields.io/npm/dm/@siyu971017/turtle.js.svg?style=flat-square)](https://npm-stat.com/charts.html?package=@siyu971017/turtle.js)
 [![Known Vulnerabilities](https://snyk.io/test/npm/@siyu971017/turtle.js/badge.svg)](https://snyk.io/test/npm/@siyu971017/turtle.js)
+[![jsdelivr hits](https://data.jsdelivr.com/v1/package/npm/@siyu971017/turtle.js/badge)](https://www.jsdelivr.com/package/npm/@siyu971017/turtle.js)
 
 ## Install
 Use npm
@@ -17,7 +18,7 @@ $ npm install @siyu971017/turtle.js
 Or grab from [jsDelivr CDN](https://www.jsdelivr.com/package/npm/@siyu971017/turtle.js)
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/@siyu971017/turtle.js@1.0/dist/turtle.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@siyu971017/turtle.js@1.1/dist/turtle.umd.min.js"></script>
 ```
 
 ## Usage
@@ -69,4 +70,13 @@ function drawRegularPolygon(sides) {
 }
 
 drawRegularPolygon(6);
+```
+
+### Change the shape
+```js
+t.shape('turtle');
+t.forward(50);
+t.shape('arrow');
+t.backward(50);
+t.shape('classic');
 ```
