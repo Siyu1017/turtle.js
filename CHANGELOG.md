@@ -1,12 +1,16 @@
 # Changelog
 
+## v1.2.1 ( 2024-07-06 )
+
+### Fixed
+- Changelog.md syntax
+- Fix npm not publishing issue
+
 ## v1.2.0 ( 2024-07-06 )
 
 ### Changed
 - Functions used to get the turtle's state will not return a value, they return a Promise object, you can use `.then()` to get the return value.
 - Now you can use `.then()` after all the available functions of turtle
-    > [!WARNING]
-    > Some functions may not return a value
 
     ```js
     // method is a function available in the current version
@@ -14,6 +18,8 @@
         // Do something...
     })
     ```
+> [!WARNING]
+> Some functions may not return a value
 
 ### Fixed
 - When using `turtle.left()`, `turtle.right()`, the turtle's heading changes, but the direction does not change.
