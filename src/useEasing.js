@@ -5,7 +5,7 @@ function useEasing(easing, func, argsFrom, argsTo, duration, origin, config) {
         easing = 'linear';
     }
     var mode = config.mode || 'diff';
-    var complete = config.complete || function() {};
+    var complete = config.complete || function () { };
     var parser = parseEasingFunction(easing);
     function getValue(from, to, percent, mode) {
         var all = to - from;
@@ -20,12 +20,11 @@ function useEasing(easing, func, argsFrom, argsTo, duration, origin, config) {
         baseArgs[key] = argsTo[key] - argsFrom[key];
     });*/
     var lastTime = startTime;
+    var arr = [...valuesFrom];
     function animate() {
         var currentTime = Date.now();
-        if (currentTime - startTime > duration) {
-            currentTime = startTime + duration;
-        }
-        var currPercent = (currentTime - startTime) / duration;
+        var over = currentTime - startTime > duration ? true : false;
+        var currentPercent = over == true ? 1 : (currentTime - startTime) / duration;
         var lastPercent = (lastTime - startTime) / duration;
         lastTime = currentTime;
         var applyArgs = [];
@@ -36,12 +35,18 @@ function useEasing(easing, func, argsFrom, argsTo, duration, origin, config) {
             */
         valuesFrom.forEach((from, i) => {
             // console.log(getValue(from, valuesTo[i], currPercent, mode), getValue(from, valuesTo[i], lastPercent, mode))
-            applyArgs.push(mode == 'based' ? getValue(from, valuesTo[i], currPercent, mode) : getValue(from, valuesTo[i], currPercent, mode) - getValue(from, valuesTo[i], lastPercent, mode))// : getValue(from, valuesTo[i], currPercent));
+            applyArgs.push(mode == 'based' ? getValue(from, valuesTo[i], currentPercent, mode) : getValue(from, valuesTo[i], currentPercent, mode) - getValue(from, valuesTo[i], lastPercent, mode))// : getValue(from, valuesTo[i], currPercent));
+            if (mode == 'based') {
+                arr[i] = getValue(from, valuesTo[i], currentPercent, mode)
+            } else {
+                arr[i] += getValue(from, valuesTo[i], currentPercent, mode) - getValue(from, valuesTo[i], lastPercent, mode);
+            }
         })
         func.apply(origin, applyArgs);
-        if (currentTime - startTime == duration) {
+        if (over == true) {
             complete();
             cancelAnimationFrame(animate);
+            // console.log(arr)
             return;
         }
         requestAnimationFrame(animate);

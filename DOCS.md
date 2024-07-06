@@ -11,15 +11,15 @@
 ### Turtle methods
 - Turtle motion
     - Move and draw
-        - [forward()](#turtleforwarddistance) | [fd()](#turtleforwarddistance)
-        - [backward()](#turtlebackwarddistance) | [bk()](#turtlebackwarddistance) | [back()](#turtlebackwarddistance)
-        - [right()](#turtlerightangle) | [rt()](#turtlerightangle)
-        - [left()](#turtleleftangle) | [lt()](#turtleleftangle)
-        - [goto()](#turtlegotox-y) | [setpos()](#turtlegotox-y) | [setposition()](#turtlegotox-y)
+        - [forward()](#turtleforwarddistance) \| [fd()](#turtleforwarddistance)
+        - [backward()](#turtlebackwarddistance) \| [bk()](#turtlebackwarddistance) \| [back()](#turtlebackwarddistance)
+        - [right()](#turtlerightangle) \| [rt()](#turtlerightangle)
+        - [left()](#turtleleftangle) \| [lt()](#turtleleftangle)
+        - [goto()](#turtlegotox-y) \| [setpos()](#turtlegotox-y) \| [setposition()](#turtlegotox-y)
         - [teleport()](#turtleteleportx-y)
         - [setx()](#turtlesetxx)
         - [sety()](#turtlesetyy)
-        - [setheading()](#turtlesetheadingangle) | [seth()](#turtlesetheadingangle)
+        - [setheading()](#turtlesetheadingangle) \| [seth()](#turtlesetheadingangle)
         - [home()](#turtlehome)
         - [circle()](#turtlecircleradius-startangle0-endangle360)
         - [dot()](#turtledotsize-color)
@@ -29,7 +29,7 @@
         - undo()
         - speed()
     - Tell Turtle’s state
-        - [position()](#turtleposition) | [pos()](#turtleposition)
+        - [position()](#turtleposition) \| [pos()](#turtleposition)
         - towards()
         - [xcor()](#turtlexcor)
         - [ycor()](#turtleycor)
@@ -40,9 +40,9 @@
         - radians()
 - Pen control
     - Drawing state
-        - [pendown()](#turtlependown) | [pd()](#turtlependown) | [down()](#turtlependown)
-        - [penup()](#turtlepenup) | [pu()](#turtlepenup) | [up()](#turtlepenup)
-        - [pensize()](#turtlepensizewidthnone) | [width()](#turtlepensizewidthnone)
+        - [pendown()](#turtlependown) \| [pd()](#turtlependown) \| [down()](#turtlependown)
+        - [penup()](#turtlepenup) \| [pu()](#turtlepenup) \| [up()](#turtlepenup)
+        - [pensize()](#turtlepensizewidthnone) \| [width()](#turtlepensizewidthnone)
         - pen()
         - [isdown()](#turtleisdown)
     - Color control
@@ -59,13 +59,13 @@
         - [write()](#turtlewritearg-movefalse-alignleft-font)
 - Turtle state
     - Visibility
-        - [showturtle()](#turtleshowturtle) | [st()](#turtleshowturtle)
-        - [hideturtle()](#turtlehideturtle) | [ht()](#turtlehideturtle)
+        - [showturtle()](#turtleshowturtle) \| [st()](#turtleshowturtle)
+        - [hideturtle()](#turtlehideturtle) \| [ht()](#turtlehideturtle)
         - [isvisible()](#turtleisvisible)
     - Appearance
         - [shape()](#turtleshapenamenone)
         - resizemode()
-        - shapesize() | turtlesize()
+        - shapesize() \| turtlesize()
         - shearfactor()
         - settiltangle()
         - tiltangle()
@@ -81,7 +81,7 @@
     - end_poly()
     - get_poly()
     - clone()
-    - getturtle() | getpen()
+    - getturtle() \| getpen()
     - getscreen()
     - setundobuffer()
     - undobufferentries()
@@ -99,17 +99,17 @@
     - update()
 - Using screen events
     - listen()
-    - onkey() | onkeyrelease()
+    - onkey() \| onkeyrelease()
     - onkeypress()
-    - onclick() | onscreenclick()
+    - onclick() \| onscreenclick()
     - ontimer()
-    - mainloop() | done()
+    - mainloop() \| done()
 - Settings and special methods
     - mode()
     - colormode()
     - getcanvas()
     - getshapes()
-    - register_shape() | addshape()
+    - register_shape() \| addshape()
     - turtles()
     - window_height()
     - window_width()

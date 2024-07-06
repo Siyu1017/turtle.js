@@ -2,11 +2,11 @@
 
 JavaScript version of turtle graphics
 
-[![npm version](https://img.shields.io/npm/v/@siyu971017/turtle.js.svg?style=flat-square)](https://www.npmjs.org/package/@siyu971017/turtle.js)
-[![npm bundle size](https://img.shields.io/bundlephobia/minzip/@siyu971017/turtle.js?style=flat-square)](https://bundlephobia.com/package/@siyu971017/turtle.js@latest)
-[![npm downloads](https://img.shields.io/npm/dm/@siyu971017/turtle.js.svg?style=flat-square)](https://npm-stat.com/charts.html?package=@siyu971017/turtle.js)
+[![npm version](https://img.shields.io/npm/v/@siyu971017/turtle.js.svg)](https://www.npmjs.org/package/@siyu971017/turtle.js)
+[![npm bundle size](https://img.shields.io/bundlephobia/minzip/@siyu971017/turtle.js@latest)](https://bundlephobia.com/package/@siyu971017/turtle.js@latest)
+[![npm downloads](https://img.shields.io/npm/dm/@siyu971017/turtle.js.svg)](https://npm-stat.com/charts.html?package=@siyu971017/turtle.js)
+[![jsdelivr hits](https://data.jsdelivr.com/v1/package/npm/@siyu971017/turtle.js/badge?style=rounded)](https://www.jsdelivr.com/package/npm/@siyu971017/turtle.js)
 [![Known Vulnerabilities](https://snyk.io/test/npm/@siyu971017/turtle.js/badge.svg)](https://snyk.io/test/npm/@siyu971017/turtle.js)
-[![jsdelivr hits](https://data.jsdelivr.com/v1/package/npm/@siyu971017/turtle.js/badge)](https://www.jsdelivr.com/package/npm/@siyu971017/turtle.js)
 
 ## Install
 Use npm
@@ -18,7 +18,7 @@ $ npm install @siyu971017/turtle.js
 Or grab from [jsDelivr CDN](https://www.jsdelivr.com/package/npm/@siyu971017/turtle.js)
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/@siyu971017/turtle.js@1.1/dist/turtle.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@siyu971017/turtle.js@1.2/dist/turtle.umd.min.js"></script>
 ```
 
 ## Usage
@@ -40,6 +40,13 @@ See [Docs](./DOCS.md) for more information
 有關更多信息，請參閱[中文版文檔](./DOCS_ZH.md)
 
 ## Examples
+
+### Get turtle's position
+```js
+t.position().then(position => {
+    console.log('position:', position);
+})
+```
 
 ### Draw a triangle
 ```js

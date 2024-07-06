@@ -11,15 +11,15 @@
 ### Turtle 方法
 - Turtle 動作
     - 移動和繪製
-        - [forward()](#turtleforwarddistance) | [fd()](#turtleforwarddistance)
-        - [backward()](#turtlebackwarddistance) | [bk()](#turtlebackwarddistance) | [back()](#turtlebackwarddistance)
-        - [right()](#turtlerightangle) | [rt()](#turtlerightangle)
-        - [left()](#turtleleftangle) | [lt()](#turtleleftangle)
-        - [goto()](#turtlegotox-y) | [setpos()](#turtlegotox-y) | [setposition()](#turtlegotox-y)
+        - [forward()](#turtleforwarddistance) \| [fd()](#turtleforwarddistance)
+        - [backward()](#turtlebackwarddistance) \| [bk()](#turtlebackwarddistance) \| [back()](#turtlebackwarddistance)
+        - [right()](#turtlerightangle) \| [rt()](#turtlerightangle)
+        - [left()](#turtleleftangle) \| [lt()](#turtleleftangle)
+        - [goto()](#turtlegotox-y) \| [setpos()](#turtlegotox-y) \| [setposition()](#turtlegotox-y)
         - [teleport()](#turtleteleportx-y)
         - [setx()](#turtlesetxx)
         - [sety()](#turtlesetyy)
-        - [setheading()](#turtlesetheadingangle) | [seth()](#turtlesetheadingangle)
+        - [setheading()](#turtlesetheadingangle) \| [seth()](#turtlesetheadingangle)
         - [home()](#turtlehome)
         - [circle()](#turtlecircleradius-startangle0-endangle360)
         - [dot()](#turtledotsize-color)
@@ -29,7 +29,7 @@
         - undo()
         - speed()
     - 獲取 turtle 的狀態
-        - [position()](#turtleposition) | [pos()](#turtleposition)
+        - [position()](#turtleposition) \| [pos()](#turtleposition)
         - towards()
         - [xcor()](#turtlexcor)
         - [ycor()](#turtleycor)
@@ -40,9 +40,9 @@
         - radians()
 - 畫筆控制
     - 繪圖狀態
-        - [pendown()](#turtlependown) | [pd()](#turtlependown) | [down()](#turtlependown)
-        - [penup()](#turtlepenup) | [pu()](#turtlepenup) | [up()](#turtlepenup)
-        - [pensize()](#turtlepensizewidthnone) | [width()](#turtlepensizewidthnone)
+        - [pendown()](#turtlependown) \| [pd()](#turtlependown) \| [down()](#turtlependown)
+        - [penup()](#turtlepenup) \| [pu()](#turtlepenup) \| [up()](#turtlepenup)
+        - [pensize()](#turtlepensizewidthnone) \| [width()](#turtlepensizewidthnone)
         - pen()
         - [isdown()](#turtleisdown)
     - 顏色控制
@@ -59,13 +59,13 @@
         - [write()](#turtlewritearg-movefalse-alignleft-font)
 - Turtle 狀態
     - 可見性
-        - [showturtle()](#turtleshowturtle) | [st()](#turtleshowturtle)
-        - [hideturtle()](#turtlehideturtle) | [ht()](#turtlehideturtle)
+        - [showturtle()](#turtleshowturtle) \| [st()](#turtleshowturtle)
+        - [hideturtle()](#turtlehideturtle) \| [ht()](#turtlehideturtle)
         - [isvisible()](#turtleisvisible)
     - 外觀
         - [shape()](#turtleshapenamenone)
         - resizemode()
-        - shapesize() | turtlesize()
+        - shapesize() \| turtlesize()
         - shearfactor()
         - settiltangle()
         - tiltangle()
@@ -81,7 +81,7 @@
     - end_poly()
     - get_poly()
     - clone()
-    - getturtle() | getpen()
+    - getturtle() \| getpen()
     - getscreen()
     - setundobuffer()
     - undobufferentries()
@@ -99,17 +99,17 @@
     - update()
 - 使用螢幕事件
     - listen()
-    - onkey() | onkeyrelease()
+    - onkey() \| onkeyrelease()
     - onkeypress()
-    - onclick() | onscreenclick()
+    - onclick() \| onscreenclick()
     - ontimer()
-    - mainloop() | done()
+    - mainloop() \| done()
 - 設定與特殊方法
     - mode()
     - colormode()
     - getcanvas()
     - getshapes()
-    - register_shape() | addshape()
+    - register_shape() \| addshape()
     - turtles()
     - window_height()
     - window_width()
