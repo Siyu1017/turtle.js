@@ -5,7 +5,7 @@
 ### Changed
 - Functions used to get the turtle's state will not return a value, they return a Promise object, you can use `.then()` to get the return value.
 - Now you can use `.then()` after all the available functions of turtle
-    > [!Warning]
+    > [!WARNING]
     > Some functions may not return a value
 
     ```js
