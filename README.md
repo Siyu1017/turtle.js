@@ -8,6 +8,8 @@ JavaScript version of turtle graphics
 [![jsdelivr hits](https://data.jsdelivr.com/v1/package/npm/@siyu971017/turtle.js/badge?style=rounded)](https://www.jsdelivr.com/package/npm/@siyu971017/turtle.js)
 [![Known Vulnerabilities](https://snyk.io/test/npm/@siyu971017/turtle.js/badge.svg)](https://snyk.io/test/npm/@siyu971017/turtle.js)
 
+> Turtle.js’ website is now available: https://turtlejs.vercel.app/
+
 ## Install
 Use npm
 
@@ -18,7 +20,7 @@ $ npm install @siyu971017/turtle.js
 Or grab from [jsDelivr CDN](https://www.jsdelivr.com/package/npm/@siyu971017/turtle.js)
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/@siyu971017/turtle.js@1.2/dist/turtle.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@siyu971017/turtle.js@1.3.0/dist/turtle.umd.min.js"></script>
 ```
 
 ## Usage

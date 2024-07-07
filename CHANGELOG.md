@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.3.0 ( 2024-07-07 )
+
+### Fixed
+- When the canvas's size is not specified in any form of CSS, its size will be infinitely enlarged.
+
 ## v1.2.1 ( 2024-07-06 )
 
 ### Fixed
@@ -18,7 +23,6 @@
         // Do something...
     })
     ```
-> [!WARNING]
 > Some functions may not return a value
 
 ### Fixed

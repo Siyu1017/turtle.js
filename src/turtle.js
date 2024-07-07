@@ -1089,9 +1089,17 @@ function unsupported(name) {
     return console.warn(`turtle v${pkg.version} does not support ${name}\nLearn more : https://github.com/Siyu1017/turtle.js/DOCS.md`);
 }
 
-function canvasClarifier(canvas, ctx) {
+function canvasClarifier(canvas, ctx, width, height) {
+    const originalSize = {
+        width: (width ? width : canvas.offsetWidth),
+        height: (height ? height : canvas.offsetHeight)
+    }
     var ratio = window.devicePixelRatio || 1;
-    canvas.width = canvas.offsetWidth * ratio;
-    canvas.height = canvas.offsetHeight * ratio;
+    canvas.width = originalSize.width * ratio;
+    canvas.height = originalSize.height * ratio;
     ctx.scale(ratio, ratio);
+    if (originalSize.width != canvas.offsetWidth || originalSize.height != canvas.offsetHeight) {
+        canvas.style.width = originalSize.width + 'px';
+        canvas.style.height = originalSize.height + 'px';
+    }
 }
