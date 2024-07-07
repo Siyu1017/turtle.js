@@ -540,6 +540,8 @@ class turtle {
                 func: function () {
                     this.state.position.x = this.canvas.offsetWidth / 2;
                     this.state.position.y = this.canvas.offsetHeight / 2;
+                    this.animateDatas.x = this.state.position.x;
+                    this.animateDatas.y = this.state.position.y;
                     this.ctx.moveTo(this.state.position.x, this.state.position.y);
                     this.animateDatas.heading = 0;
                     this.state.heading = 0;

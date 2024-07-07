@@ -20,7 +20,7 @@ $ npm install @siyu971017/turtle.js
 Or grab from [jsDelivr CDN](https://www.jsdelivr.com/package/npm/@siyu971017/turtle.js)
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/@siyu971017/turtle.js@1.3.0/dist/turtle.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@siyu971017/turtle.js/dist/turtle.umd.min.js"></script>
 ```
 
 ## Usage

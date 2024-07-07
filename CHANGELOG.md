@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.3.1 ( 2024-07-07 )
+
+### Fixed
+- Calling `turtle.home()` but doesn't work
+
 ## v1.3.0 ( 2024-07-07 )
 
 ### Fixed
