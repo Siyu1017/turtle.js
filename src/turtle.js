@@ -3,6 +3,10 @@
 import pkg from '../package.json';
 import useEasing from './useEasing';
 
+import mouseCoordinate from './plugins/mouse-coordinate';
+import turtleAction from './plugins/turtle-action';
+import turtleFps from './plugins/turtle-fps';
+
 class turtle {
     version = pkg.version;
     defaultState = {
@@ -52,6 +56,11 @@ class turtle {
         heading: 0,
         speed: 5
     }
+    animateDatas = {
+        heading: 0,
+        x: 0,
+        y: 0
+    }
     shapes = {
         "arrow": {
             type: "polygon",
@@ -91,19 +100,15 @@ class turtle {
             points: [[0, 0], [-5, -9], [0, -7], [5, -9]]
         }
     }
-    actionQueue = [];
-    imageData = null;
-    animateDatas = {
-        heading: 0,
-        x: 0,
-        y: 0
-    }
+    _imageData = null;
+    _listeners = {};
+    _actionQueue = [];
     _saveImageData() {
-        this.imageData = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
+        this._imageData = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
         return this;
     }
     _restoreImageData() {
-        if (this.imageData) this.ctx.putImageData(this.imageData, 0, 0);
+        if (this._imageData) this.ctx.putImageData(this._imageData, 0, 0);
         return this;
     }
     _getComputedDistance(value, heading) {
@@ -165,6 +170,18 @@ class turtle {
     _getVirtualPosition(x, y) {
         return this._convertPositon(x, y, 'r');
     }
+    _triggerEvent(event, detail) {
+        try {
+            this._listeners[event].forEach(fn => {
+                fn(detail);
+            })
+        } catch (e) { };
+    }
+    _plugins = {
+        'mouse-coordinate': mouseCoordinate,
+        'turtle-action': turtleAction,
+        'turtle-fps': turtleFps
+    };
     constructor(canvas) {
         this.canvas = canvas;
         this.ctx = this.canvas.getContext('2d', { willReadFrequently: true });
@@ -179,6 +196,29 @@ class turtle {
 
         var lastTime = Date.now();
         var currentAction = 0;
+
+        // Add listeners
+
+        const mouseEventsOnCanvas = ['click', 'dblclick', 'mousedown', 'mouseenter', 'mouseleave', 'mouseover', 'mouseout', 'mouseup', 'contextmenu'];
+        const mouseEventsOnWindow = ['mousemove'];
+
+        mouseEventsOnCanvas.forEach(event => {
+            this.canvas.addEventListener(event, (e) => {
+                this._triggerEvent(event, {
+                    x: e.clientX - this.canvas.offsetLeft,
+                    y: e.clientY - this.canvas.offsetTop
+                });
+            });
+        })
+
+        mouseEventsOnWindow.forEach(event => {
+            window.addEventListener(event, (e) => {
+                this._triggerEvent(event, {
+                    x: e.clientX - this.canvas.offsetLeft,
+                    y: e.clientY - this.canvas.offsetTop
+                });
+            });
+        })
 
         /*
         function drawShape() {
@@ -210,7 +250,7 @@ class turtle {
             var points = [...this.shapes[name].points];
             var path = new Path2D();
             path.moveTo(points[0][0], points[0][1]);
-            points.shift();
+            // points.shift();
             points.forEach(arr => {
                 path.lineTo(arr[0], arr[1]);
             })
@@ -237,10 +277,12 @@ class turtle {
             this.ctx.lineJoin = this.config.lineJoin;
             this.ctx.strokeStyle = this.config.penColor;
             this.ctx.fillStyle = this.config.fillColor;
-            var useTransition = false;
-            if (transitionActionsWithDistance.concat(transitionActionsWithCoordinate).concat(transitionActionsWithAngle).includes(action.name)) {
-                useTransition = true;
-            }
+            this._triggerEvent('start', {
+                name: action.name,
+                state: this.state,
+                config: this.config,
+                args: action.args
+            })
             if (transitionActionsWithAngle.includes(action.name)) {
                 // turtle.left
                 // turtle.right
@@ -258,6 +300,12 @@ class turtle {
                     mode: 'diff',
                     complete: (() => {
                         this.animateDatas.heading = this.state.heading;
+                        this._triggerEvent('complete', {
+                            name: action.name,
+                            state: this.state,
+                            config: this.config,
+                            args: action.args
+                        })
                         action.complete ? action.complete() : null;
                     }).bind(this)
                 })
@@ -273,6 +321,12 @@ class turtle {
                     complete: (() => {
                         this.animateDatas.x = this.state.position.x;
                         this.animateDatas.y = this.state.position.y;
+                        this._triggerEvent('complete', {
+                            name: action.name,
+                            state: this.state,
+                            config: this.config,
+                            args: action.args
+                        })
                         action.complete ? action.complete() : null;
                     }).bind(this)
                 });
@@ -289,41 +343,76 @@ class turtle {
                     complete: (() => {
                         this.animateDatas.x = this.state.position.x;
                         this.animateDatas.y = this.state.position.y;
+                        this._triggerEvent('complete', {
+                            name: action.name,
+                            state: this.state,
+                            config: this.config,
+                            args: action.args
+                        })
                         action.complete ? action.complete() : null;
                     }).bind(this)
                 });
             } else if (action.func) {
                 action.func.apply(this, Object.values(action.args));
-            }
-            if (!useTransition) {
+                this._triggerEvent('complete', {
+                    name: action.name,
+                    state: this.state,
+                    config: this.config,
+                    args: action.args
+                })
                 this.ctx.restore();
                 this._saveImageData();
             }
         }
 
-        function checkAction() {
-            if (this.actionQueue.length > 0 && currentAction < this.actionQueue.length) {
-                runAction(this.actionQueue[currentAction]);
+        function checkAction(now) {
+            if (this._actionQueue.length > 0 && currentAction < this._actionQueue.length) {
+                runAction(this._actionQueue[currentAction]);
                 currentAction++;
-                if (this.actionQueue.length > 0 && currentAction < this.actionQueue.length) {
-                    if (this.actionQueue[currentAction - 1].type == 'control' || this.actionQueue[currentAction - 1].type == 'state' || this.actionQueue[currentAction - 1].type == 'teleport') {
-                        checkAction();
+                if (this._actionQueue.length > 0 && currentAction < this._actionQueue.length) {
+                    if (this._actionQueue[currentAction - 1].type == 'control' || this._actionQueue[currentAction - 1].type == 'state' || this._actionQueue[currentAction - 1].type == 'teleport') {
+                        // console.log('current action:', this._actionQueue[currentAction - 1], '\nnext action:', this._actionQueue[currentAction], '\ntype:', this._actionQueue[currentAction - 1].type)
+                        return now - this.config.transitionDuration;
+                        // checkAction();
                     }
                 }
-                // this.actionQueue.shift();
+                // this._actionQueue.shift();
             }
         }
 
         function animate() {
             canvasClarifier(this.canvas, this.ctx);
-            if (Date.now() - lastTime > this.config.transitionDuration) {
-                checkAction();
-                lastTime = Date.now();
-            }
             this._restoreImageData();
+            var now = Date.now();
+            if (Date.now() - lastTime > this.config.transitionDuration) {
+                var time = checkAction(now);
+                if (time) {
+                    lastTime = time;
+                } else {
+                    lastTime = Date.now();
+                }
+            }
             if (this.config.shapeVisible == true) {
                 drawShape(this.config.shape);
             }
+            function isNumber(x) {
+                return typeof x === "number" && isFinite(x);
+            }
+            try {
+                Object.values(this._plugins).sort((a, b) => {
+                    a.zIndex = Number(a.zIndex);
+                    b.zIndex = Number(b.zIndex);
+                    if (!isNumber(a.zIndex)) a.zIndex = 0;
+                    if (!isNumber(b.zIndex)) b.zIndex = 0;
+                    return a.zIndex - b.zIndex;
+                }).forEach(plugin => {
+                    if (plugin.enable == true) {
+                        plugin.execute ? plugin.execute(this) : null;
+                    }
+                })
+            } catch (e) {
+                console.log(e);
+            };
             requestAnimationFrame(() => animate());
         }
         checkAction = checkAction.bind(this);
@@ -335,7 +424,7 @@ class turtle {
     // Methods specific to Turtle.js
     setlinecap(type) {
         return new Promise((resolve) => {
-            this.actionQueue.push({
+            this._actionQueue.push({
                 type: 'control',
                 name: 'setlinecap',
                 args: [type],
@@ -352,7 +441,7 @@ class turtle {
     }
     setlinejoin(type) {
         return new Promise((resolve) => {
-            this.actionQueue.push({
+            this._actionQueue.push({
                 type: 'control',
                 name: 'setlinejoin',
                 args: [type],
@@ -369,7 +458,7 @@ class turtle {
     }
     seteasing(easing) {
         return new Promise((resolve) => {
-            this.actionQueue.push({
+            this._actionQueue.push({
                 type: 'control',
                 name: 'seteasing',
                 args: [easing],
@@ -385,7 +474,7 @@ class turtle {
     }
     setduration(duration) {
         return new Promise((resolve) => {
-            this.actionQueue.push({
+            this._actionQueue.push({
                 type: 'control',
                 name: 'setduration',
                 args: [duration],
@@ -396,14 +485,50 @@ class turtle {
             })
         })
     }
+    on(event, func = () => { }) {
+        if (!this._listeners.hasOwnProperty(event)) {
+            this._listeners[event] = [];
+        }
+        this._listeners[event].push(func);
+    }
+    enable(pluginName) {
+        if (this._plugins.hasOwnProperty(pluginName)) {
+            this._plugins[pluginName].enable = true;
+            if (this._plugins[pluginName].initialized == true) return;
+            try {
+                this._plugins[pluginName].init ? this._plugins[pluginName].init(this) : null;
+            } catch (e) { };
+            this._plugins[pluginName].initialized = true;
+        }
+    }
+    disable(pluginName) {
+        if (this._plugins.hasOwnProperty(pluginName)) {
+            this._plugins[pluginName].enable = false;
+        }
+    }
+    toggle(pluginName) {
+        if (this._plugins.hasOwnProperty(pluginName)) {
+            this._plugins[pluginName].enable = this._plugins[pluginName].enable == true ? false : true;
+            if (this._plugins[pluginName].enable == true) {
+                this.enable(pluginName);
+            }
+        }
+    }
+    register(plugin) {
+        this._plugins[plugin.name] = plugin;
+    }
+    unregister(pluginName) {
+        delete this._plugins[pluginName];
+    }
     // Actions
     forward(value) {
         return new Promise((resolve) => {
-            this.actionQueue.push({
+            this._actionQueue.push({
                 name: 'forward',
                 args: [value],
                 func: function (value) {
                     this._restoreImageData();
+                    this.ctx.beginPath();
                     this.ctx.save();
                     this.ctx.lineWidth = this.config.penSize;
                     this.ctx.lineCap = this.config.lineCap;
@@ -413,6 +538,7 @@ class turtle {
                     this.animateDatas.x += distance.x;
                     this.animateDatas.y += distance.y;
                     this.ctx.lineTo(this.animateDatas.x, this.animateDatas.y);
+                    this.ctx.closePath();
                     if (this.state.penDown == true) {
                         this.ctx.stroke();
                     }
@@ -428,7 +554,7 @@ class turtle {
     }
     right(value) {
         return new Promise((resolve) => {
-            this.actionQueue.push({
+            this._actionQueue.push({
                 name: 'right',
                 args: [value],
                 func: function (value) {
@@ -443,7 +569,7 @@ class turtle {
     }
     left(value) {
         return new Promise((resolve) => {
-            this.actionQueue.push({
+            this._actionQueue.push({
                 name: 'left',
                 args: [value],
                 func: function (value) {
@@ -458,7 +584,7 @@ class turtle {
     }
     goto(x, y) {
         return new Promise((resolve) => {
-            this.actionQueue.push({
+            this._actionQueue.push({
                 name: 'goto',
                 args: [x, y],
                 func: function (x, y) {
@@ -476,7 +602,7 @@ class turtle {
     }
     teleport(x, y) {
         return new Promise((resolve) => {
-            this.actionQueue.push({
+            this._actionQueue.push({
                 type: 'teleport',
                 name: 'teleport',
                 args: [x, y],
@@ -493,7 +619,7 @@ class turtle {
     }
     setx(value) {
         return new Promise((resolve) => {
-            this.actionQueue.push({
+            this._actionQueue.push({
                 name: 'setx',
                 args: [value],
                 func: function (value) {
@@ -507,7 +633,7 @@ class turtle {
     }
     sety(value) {
         return new Promise((resolve) => {
-            this.actionQueue.push({
+            this._actionQueue.push({
                 name: 'sety',
                 args: [value],
                 func: function (value) {
@@ -521,7 +647,7 @@ class turtle {
     }
     setheading(angle) {
         return new Promise((resolve) => {
-            this.actionQueue.push({
+            this._actionQueue.push({
                 name: 'setheading',
                 args: [angle],
                 func: function (angle) {
@@ -534,7 +660,7 @@ class turtle {
     }
     home() {
         return new Promise((resolve) => {
-            this.actionQueue.push({
+            this._actionQueue.push({
                 name: 'home',
                 args: [],
                 func: function () {
@@ -546,13 +672,14 @@ class turtle {
                     this.animateDatas.heading = 0;
                     this.state.heading = 0;
                     resolve(this.state);
+                    // setTimeout(() => { resolve(this.state) }, this.config.transitionDuration);
                 }
             })
         })
     }
     circle(radius, startAngle = 0, endAngle = 360) {
         return new Promise((resolve) => {
-            this.actionQueue.push({
+            this._actionQueue.push({
                 name: 'circle',
                 args: [radius, startAngle, endAngle],
                 func: function (radius, startAngle = 0, endAngle = 360) {
@@ -565,7 +692,7 @@ class turtle {
     }
     dot(size, color) {
         return new Promise((resolve) => {
-            this.actionQueue.push({
+            this._actionQueue.push({
                 name: 'dot',
                 args: [size, color],
                 func: function (size, color) {
@@ -605,7 +732,7 @@ class turtle {
     // state
     position() {
         return new Promise((resolve) => {
-            this.actionQueue.push({
+            this._actionQueue.push({
                 type: 'state',
                 name: 'position',
                 args: [],
@@ -623,7 +750,7 @@ class turtle {
     }
     xcor() {
         return new Promise((resolve) => {
-            this.actionQueue.push({
+            this._actionQueue.push({
                 type: 'state',
                 name: 'xcor',
                 args: [],
@@ -635,7 +762,7 @@ class turtle {
     }
     ycor() {
         return new Promise((resolve) => {
-            this.actionQueue.push({
+            this._actionQueue.push({
                 type: 'state',
                 name: 'ycor',
                 args: [],
@@ -647,7 +774,7 @@ class turtle {
     }
     heading() {
         return new Promise((resolve) => {
-            this.actionQueue.push({
+            this._actionQueue.push({
                 type: 'state',
                 name: 'heading',
                 args: [],
@@ -670,7 +797,7 @@ class turtle {
     // Control
     pendown() {
         return new Promise((resolve) => {
-            this.actionQueue.push({
+            this._actionQueue.push({
                 type: 'control',
                 name: 'pendown',
                 args: [],
@@ -684,7 +811,7 @@ class turtle {
     }
     penup() {
         return new Promise((resolve) => {
-            this.actionQueue.push({
+            this._actionQueue.push({
                 type: 'control',
                 name: 'penup',
                 args: [],
@@ -699,7 +826,7 @@ class turtle {
     pensize(width) {
         if (!width) {
             return new Promise((resolve) => {
-                this.actionQueue.push({
+                this._actionQueue.push({
                     type: 'state',
                     name: 'pensize',
                     args: [],
@@ -710,7 +837,7 @@ class turtle {
             })
         }
         return new Promise((resolve) => {
-            this.actionQueue.push({
+            this._actionQueue.push({
                 type: 'control',
                 name: 'pensize',
                 args: [width],
@@ -730,7 +857,7 @@ class turtle {
     }
     isdown() {
         return new Promise((resolve) => {
-            this.actionQueue.push({
+            this._actionQueue.push({
                 type: 'state',
                 name: 'isdown',
                 args: [],
@@ -744,7 +871,7 @@ class turtle {
     pencolor(color) {
         if (!color) {
             return new Promise((resolve) => {
-                this.actionQueue.push({
+                this._actionQueue.push({
                     type: 'state',
                     name: 'pencolor',
                     args: [],
@@ -755,7 +882,7 @@ class turtle {
             })
         }
         return new Promise((resolve) => {
-            this.actionQueue.push({
+            this._actionQueue.push({
                 type: 'control',
                 name: 'pencolor',
                 args: [color],
@@ -770,7 +897,7 @@ class turtle {
     fillcolor(color) {
         if (!color) {
             return new Promise((resolve) => {
-                this.actionQueue.push({
+                this._actionQueue.push({
                     type: 'state',
                     name: 'fillcolor',
                     args: [],
@@ -781,7 +908,7 @@ class turtle {
             })
         }
         return new Promise((resolve) => {
-            this.actionQueue.push({
+            this._actionQueue.push({
                 type: 'control',
                 name: 'fillcolor',
                 args: [color],
@@ -796,7 +923,7 @@ class turtle {
     color(color) {
         if (!color) {
             return new Promise((resolve) => {
-                this.actionQueue.push({
+                this._actionQueue.push({
                     type: 'state',
                     name: 'color',
                     args: [],
@@ -810,7 +937,7 @@ class turtle {
             })
         }
         return new Promise((resolve) => {
-            this.actionQueue.push({
+            this._actionQueue.push({
                 type: 'control',
                 name: 'color',
                 args: [color],
@@ -828,7 +955,7 @@ class turtle {
     }
     filling() {
         return new Promise((resolve) => {
-            this.actionQueue.push({
+            this._actionQueue.push({
                 type: 'state',
                 name: 'filling',
                 args: [],
@@ -840,7 +967,7 @@ class turtle {
     }
     begin_fill() {
         return new Promise((resolve) => {
-            this.actionQueue.push({
+            this._actionQueue.push({
                 type: 'control',
                 name: 'begin_fill',
                 args: [],
@@ -854,7 +981,7 @@ class turtle {
     }
     end_fill() {
         return new Promise((resolve) => {
-            this.actionQueue.push({
+            this._actionQueue.push({
                 type: 'control',
                 name: 'end_fill',
                 args: [],
@@ -873,13 +1000,13 @@ class turtle {
     }
     reset() {
         return new Promise((resolve) => {
-            this.actionQueue.push({
+            this._actionQueue.push({
                 // type: 'control',
                 name: 'reset',
                 args: [],
                 func: function () {
                     canvasClarifier(this.canvas, this.ctx);
-                    // this.imageData = null;
+                    // this._imageData = null;
                     this.state = this.defaultState;
                     this.config = this.defaultConfig;
                     this.state.position.x = this.canvas.offsetWidth / 2;
@@ -903,7 +1030,7 @@ class turtle {
     }
     write(arg, move = false, align = 'left', font) {
         return new Promise((resolve) => {
-            this.actionQueue.push({
+            this._actionQueue.push({
                 name: 'write',
                 args: [arg, move, align, font],
                 func: function (arg, move = false, align = 'left', font) {
@@ -919,7 +1046,7 @@ class turtle {
     // Visibility
     showturtle() {
         return new Promise((resolve) => {
-            this.actionQueue.push({
+            this._actionQueue.push({
                 type: 'control',
                 name: 'showturtle',
                 args: [],
@@ -932,7 +1059,7 @@ class turtle {
     }
     hideturtle() {
         return new Promise((resolve) => {
-            this.actionQueue.push({
+            this._actionQueue.push({
                 type: 'control',
                 name: 'hideturtle',
                 args: [],
@@ -945,7 +1072,7 @@ class turtle {
     }
     isvisible() {
         return new Promise((resolve) => {
-            this.actionQueue.push({
+            this._actionQueue.push({
                 type: 'state',
                 name: 'isvisibl',
                 args: [],
@@ -959,7 +1086,7 @@ class turtle {
     shape(name) {
         if (!name) {
             return new Promise((resolve) => {
-                this.actionQueue.push({
+                this._actionQueue.push({
                     type: 'state',
                     name: 'shape',
                     args: [],
@@ -970,7 +1097,7 @@ class turtle {
             })
         }
         return new Promise((resolve) => {
-            this.actionQueue.push({
+            this._actionQueue.push({
                 type: 'control',
                 name: 'shape',
                 args: [name],

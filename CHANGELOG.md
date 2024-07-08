@@ -1,5 +1,16 @@
 # Changelog
 
+## v1.4.0 ( 2024-07-08 )
+
+## Added
+- `turtle.on(event, func)` - Add event listener
+- `turtle.enable(pluginName)` - Enable plugin
+- `turtle.disable(pluginName)` - Disable plugin
+- `turtle.toggle(pluginName)` - Toggle plugin
+- `turtle.register(plugin)` - Register a plugin
+- `turtle.unregister(pluginName)` - Unregister a plugin
+> Learn more on https://turtlejs.vercel.app/docs/plugin
+
 ## v1.3.1 ( 2024-07-07 )
 
 ### Fixed

@@ -37,9 +37,7 @@ Or grab from [jsDelivr CDN](https://www.jsdelivr.com/package/npm/@siyu971017/tur
     ```
 
 ## Methods
-See [Docs](./DOCS.md) for more information
-
-有關更多信息，請參閱[中文版文檔](./DOCS_ZH.md)
+See [Docs](https://turtlejs.vercel.app/docs) for more information
 
 ## Examples
 
