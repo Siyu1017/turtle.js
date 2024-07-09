@@ -1,8 +1,14 @@
 # Changelog
 
+## v1.5.0 ( 2024-07-09 )
+
+### Fixed 
+- `turtle.forward()` - Wrong pen color.
+- Plugin `mouse-coordinate` - Label overflows canvas
+
 ## v1.4.0 ( 2024-07-08 )
 
-## Added
+### Added
 - `turtle.on(event, func)` - Add event listener
 - `turtle.enable(pluginName)` - Enable plugin
 - `turtle.disable(pluginName)` - Disable plugin

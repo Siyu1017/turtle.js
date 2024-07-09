@@ -1,6 +1,6 @@
 {
   "name": "@siyu971017/turtle.js",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "JavaScript version of turtle graphics",
   "main": "dist/turtle.umd.js",
   "module": "dist/turtle.esm.js",

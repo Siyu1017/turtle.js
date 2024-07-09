@@ -33,6 +33,23 @@ const mouseCoordinate = {
             api.ctx.stroke();
             api.ctx.restore();
         }
+        CanvasRenderingContext2D.prototype.autoPosition = function (x, y, width, height, margin = 8) {
+            var translateX = 0;
+            var translateY = 0;
+            if (x + width + margin > this.canvas.offsetWidth) {
+                translateX = x - (((x - width - margin) > this.canvas.offsetWidth - width - margin ? this.canvas.offsetWidth : x) - width - margin);
+            }
+            if (x - margin < 0) {
+                translateX = x - margin;
+            }
+            if (y + height + margin > this.canvas.offsetHeight) {
+                translateY = y - (((y - height - margin) > this.canvas.offsetHeight - height - margin ? this.canvas.offsetHeight : y) - height - margin);
+            }
+            if (y - margin < 0) {
+                translateY = y - margin;
+            }
+            this.translate(-translateX, -translateY);
+        }
         CanvasRenderingContext2D.prototype.textBlock = function (text, x, y, padding, radius, config = {}) {
             this.save();
             this.beginPath();
@@ -46,13 +63,16 @@ const mouseCoordinate = {
                 height: height + padding.top + padding.bottom
             }
             if (config.align == 'center') {
+                this.autoPosition(x - rectSize.width / 2, y, rectSize.width, rectSize.height);
                 this.roundRect(x - rectSize.width / 2, y, rectSize.width, rectSize.height, radius, config);
                 this.textAlign = 'center';
                 this.fillText(text, x, y + (height + padding.top + padding.bottom) / 2);
             } else if (config.align == 'right') {
+                this.autoPosition(x - rectSize.width, y, rectSize.width, rectSize.height);
                 this.roundRect(x - rectSize.width, y, rectSize.width, rectSize.height, radius, config);
                 this.fillText(text, x - rectSize.width + padding.left, y + (height + padding.top + padding.bottom) / 2);
             } else {
+                this.autoPosition(x, y, rectSize.width, rectSize.height);
                 this.roundRect(x, y, width + padding.left + padding.right, height + padding.top + padding.bottom, radius, config);
                 this.fillText(text, x + padding.left, y + (height + padding.top + padding.bottom) / 2);
             }

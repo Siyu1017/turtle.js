@@ -540,6 +540,7 @@ class turtle {
                     this.ctx.lineTo(this.animateDatas.x, this.animateDatas.y);
                     this.ctx.closePath();
                     if (this.state.penDown == true) {
+                        this.ctx.strokeStyle = this.config.penColor;
                         this.ctx.stroke();
                     }
                     this.ctx.restore();
